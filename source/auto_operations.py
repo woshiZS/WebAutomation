@@ -9,21 +9,26 @@ from selenium.webdriver.common.by import By
 class MyDriver():
     '''Create a webdriver and finish your task'''
     def __init__(self,PATH):
-        options = webdriver.ChromeOptions()
         # you can add headingless options on your own
+        chromeOptions = webdriver.ChromeOptions()
+        chromeOptions.add_argument("--headless")
+        chromeOptions.add_argument("--remote-debugging-port=9222")
+        chromeOptions.add_argument('--no-sandbox')
         prefs = {"profile.default_content_setting_values.geolocation" :2}
-        options.add_experimental_option("prefs",prefs)
-        self.driver = webdriver.Chrome(PATH,options=options)
+        chromeOptions.add_experimental_option("prefs",prefs)
+        self.driver = webdriver.Chrome(PATH,options=chromeOptions)
 
     def login(self,name,pwd):
         '''Just for login, you can also use cookies here'''
         self.driver.get("https://healthreport.zju.edu.cn/ncov/wap/default/index")
-        username = WebDriverWait(driver,10).until(
-                EC.presence_of_element_located((By.ID,"username"))
+        elem = self.driver.find_element_by_tag_name('label')
+        print(elem.text)
+        username = WebDriverWait(self.driver,10).until(
+                EC.presence_of_element_located((By.NAME,"username"))
         )
-        #login first 
-        password = driver.find_element_by_id("password")
-        button = driver.find_element_by_id("dl")
+        #login first
+        password = self.driver.find_element_by_name("password")
+        button = self.driver.find_element_by_id("dl")
         username.clear()
         username.send_keys(name)
         password.clear()
@@ -32,16 +37,19 @@ class MyDriver():
 
     def fill_forms(self,item):
         '''filling the forms'''
-        WebDriverWait(driver,10).until(
+        WebDriverWait(self.driver,10).until(
         EC.presence_of_element_located((By.XPATH,"//ul/li[18]/div[1]/div[1]/div[1]"))
         ).click()
+        print("成功完成登录")
 
         #是否出入境
-        btn = driver.find_element_by_xpath("//ul/li[25]/div[1]/div[1]/div[2]/span[1]")
+        btn = self.driver.find_element_by_xpath("//ul/li[25]/div[1]/div[1]/div[2]/span[1]")
+        print(btn.text)
         btn.click()
 
         #最后填写的是否确认
-        btn = driver.find_element_by_xpath("//ul/li[37]/div[1]/div[1]/div[1]/span[1]")
+        btn = self.driver.find_element_by_xpath("//ul/li[37]/div[1]/div[1]/div[1]/span[1]")
+        print(btn.text)
         btn.click()
 
         #redundant code
@@ -49,30 +57,32 @@ class MyDriver():
         # btn.click()
 
         #Ip
-        area = driver.find_element_by_name("area")
+        area = self.driver.find_element_by_name("area")
         btn = area.find_element_by_tag_name("input")
         btn.click()
 
         #获取到提示窗体
-        confirm = WebDriverWait(driver,10).until(EC.presence_of_element_located(
+        confirm = WebDriverWait(self.driver,10).until(EC.presence_of_element_located(
             (By.XPATH,"/html/body/div[4]/div[1]/div[2]/div[1]")
         ))
         confirm.click()
 
-        Ip = driver.find_element_by_name("ip")
+        Ip = self.driver.find_element_by_name("ip")
 
-        WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[1]/option[@value='{item[3]}']"))).click()
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[1]/option[@value='{item[3]}']"))).click()
 
-        WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[2]/option[@value='{item[4]}']"))).click()
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[2]/option[@value='{item[4]}']"))).click()
 
-        WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[3]/option[@value='{item[5]}']"))).click()
+        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[3]/option[@value='{item[5]}']"))).click()
 
         # wait for implementation,cause if your location is different from yesterday's. The js will show another form.
-
+        print('成功完成填表部分')
+        '''
         submit = driver.find_element_by_link_text("提交信息 Submit information")
         submit.click()
 
         WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,"//body/div[5]/div[1]/div[2]/div[2]"))).click()
-    
+        '''
+
     def quit(self):
         self.driver.quit()

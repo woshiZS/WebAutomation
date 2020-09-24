@@ -1,6 +1,6 @@
 import getpass
-from .connect_db import MyDataBase
-from .auto_operations import MyDriver
+from connect_db import MyDataBase
+from auto_operations import MyDriver
 
 host = input("Please input your host ip address.\n")
 user = input("Please input your user name\n")
