@@ -15,7 +15,7 @@ class MyDriver():
         
         # Do not use this port cause it may be banned on your pc.
         # chromeOptions.add_argument("--remote-debugging-port=9222")
-        chromeOptions.add_argument('--no-sandbox')
+        # chromeOptions.add_argument('--no-sandbox')
         prefs = {"profile.default_content_setting_values.geolocation" :2}
         chromeOptions.add_experimental_option("prefs",prefs)
         self.driver = webdriver.Chrome(PATH,options=chromeOptions)
@@ -64,27 +64,32 @@ class MyDriver():
         btn.click()
 
         #获取到提示窗体
-        confirm = WebDriverWait(self.driver,10).until(EC.presence_of_element_located(
-            (By.XPATH,"/html/body/div[4]/div[1]/div[2]/div[1]")
-        ))
-        confirm.click()
+        try:
+            confirm = WebDriverWait(self.driver,10).until(EC.presence_of_element_located(
+                (By.XPATH,"/html/body/div[4]/div[1]/div[2]/div[1]")
+            ))
+            confirm.click()
 
-        Ip = self.driver.find_element_by_name("ip")
+            Ip = self.driver.find_element_by_name("ip")
 
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[1]/option[@value='{item[3]}']"))).click()
+            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[1]/option[@value='{item[3]}']"))).click()
 
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[2]/option[@value='{item[4]}']"))).click()
+            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[2]/option[@value='{item[4]}']"))).click()
 
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[3]/option[@value='{item[5]}']"))).click()
-
+            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,f"//div[1]/div[1]/select[3]/option[@value='{item[5]}']"))).click()
+        except:
+            print("校内网自动定位成功。")
         # wait for implementation,cause if your location is different from yesterday's. The js will show another form.
 
         submit = self.driver.find_element_by_link_text("提交信息 Submit information")
         submit.click()
-
-        WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,"//body/div[5]/div[1]/div[2]/div[2]"))).click()
         
-        print(f'学号{item[0]}成功完成打卡')
+        # 这里应该捕捉一个timeoutexception,或者捕捉已经打卡的提示信息。
+        try:
+            WebDriverWait(self.driver,10).until(EC.element_to_be_clickable((By.XPATH,"//body/div[4]/div[1]/div[2]/div[2]"))).click()
+            print(f'学号{item[0]}成功完成打卡')
+        except:
+            print(f"学号{item[0]}今日已经打过卡了!")
 
 
     def quit(self):
